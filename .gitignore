@@ -1,0 +1,18 @@
+# Ortam değişkenleri & API anahtarları (ASLA repoya gönderme)
+.env
+
+# Yerel SQLite önbelleği ve macOS sistem dosyaları
+data/cache.db
+*.db
+.DS_Store
+
+# Python sanal ortamı ve önbellek
+.venv/
+__pycache__/
+*.pyc
+
+# Geçici derleme klasörleri ve tekil ikili dosyalar
+build/
+macos-swift/GTA6Altyazi
+macos-swift/.build/
+dist/GTA6 Türkçe Altyazı.app/

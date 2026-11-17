@@ -1,0 +1,65 @@
+{
+  "capture_fps" : 15,
+  "ocr" : {
+    "empty_frame_phash_threshold" : 2,
+    "language" : "en-US",
+    "min_confidence" : 0.45000000000000001,
+    "min_text_height_ratio" : 0.080000000000000002,
+    "phash_threshold" : 4
+  },
+  "overlay" : {
+    "auto_cover_roi" : true,
+    "background_opacity" : 0.29999999999999999,
+    "border_radius" : 8,
+    "font_family" : "Helvetica Neue",
+    "font_size" : 16,
+    "offset_x" : 0,
+    "offset_y" : -160,
+    "original_font_size" : 13,
+    "padding_x" : 14,
+    "padding_y" : 6,
+    "placement" : "custom_drag",
+    "show_original_english" : true,
+    "show_status_badge" : true,
+    "speaker_colors" : {
+      "DEFAULT" : "#FFD54F",
+      "JASON" : "#4FC3F7",
+      "LUCIA" : "#FF6B9D"
+    }
+  },
+  "roi" : {
+    "screen_rect" : {
+      "height" : 36,
+      "width" : 471,
+      "x" : 416,
+      "y" : 613
+    },
+    "use_custom_screen_rect" : true,
+    "window_relative" : {
+      "h_ratio" : 0.14000000000000001,
+      "w_ratio" : 0.71999999999999997,
+      "x_ratio" : 0.14000000000000001,
+      "y_ratio" : 0.80000000000000004
+    }
+  },
+  "stabilizer" : {
+    "clear_after_empty_frames" : 4,
+    "max_history" : 15,
+    "required_consecutive_frames" : 2,
+    "similarity_threshold" : 86
+  },
+  "target_window_titles" : [
+    "PS Remote Play",
+    "Remote Play",
+    "chiaki-ng",
+    "Chiaki"
+  ],
+  "translator" : {
+    "cache_db_path" : "data\/cache.db",
+    "context_window_size" : 8,
+    "glossary_path" : "data\/glossary.json",
+    "max_chars_per_line" : 48,
+    "max_lines" : 2,
+    "request_timeout_sec" : 5
+  }
+}
