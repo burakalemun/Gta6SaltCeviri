@@ -4,8 +4,10 @@
 
 `SaltCeviri-macOS-M2.dmg` dosyasını açıp **`SaltCeviri.app`** ikonunu **`Applications`** klasörüne sürükledikten sonra aşağıdaki adımları sırayla uygulayın:
 
-> **⚠️ "SaltÇeviri uygulaması açılamıyor" uyarısı çıkarsa:**
-> DMG içindeki **`Acilmiyorsa_Buna_Tikla.command`** dosyasına çift tıklayın (veya **Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç** deyin). Bu işlem sadece ilk açılışta gerekir.
+> **⚠️ İlk Açılışta `"SaltCeviri" Açılmadı` (Apple doğrulayamadı) Uyarısı Çıkarsa:**
+> 1. Uyarıda **"Bitti"** butonuna basın.
+> 2. **Sistem Ayarları → Gizlilik ve Güvenlik** sayfasını açıp en aşağıya inin ve **`"SaltCeviri"` için "Yine de Aç"** butonuna tıklayın.
+> *(Alternatif olarak Terminal'de `xattr -cr /Applications/SaltCeviri.app` komutunu çalıştırabilirsiniz — sadece ilk açılışta gerekir).*
 
 ---
 

@@ -171,34 +171,12 @@ EOF
 xattr -cr "$APP_BUNDLE"
 codesign --force --deep --sign - --identifier com.saltceviri.app "$APP_BUNDLE"
 
-# 3) DMG Sahnesini Hazırla (.app + Applications Kısayolu + Kurulum Notları + Gatekeeper Açıcı)
+# 3) DMG Sahnesini Hazırla (.app + Applications Kısayolu + Kurulum Notları)
 cp -R "$APP_BUNDLE" "$DMG_STAGE/"
 ln -s /Applications "$DMG_STAGE/Applications"
 if [ -f "$PROJECT_DIR/NOTLAR.md" ]; then
     cp "$PROJECT_DIR/NOTLAR.md" "$DMG_STAGE/KURULUM_NOTLARI.md"
 fi
-
-cat > "$DMG_STAGE/Acilmiyorsa_Buna_Tikla.command" <<'EOF'
-#!/usr/bin/env zsh
-# Apple Notarization olmayan açık kaynak macOS uygulamaları için Gatekeeper karantinasını kaldırır ve uygulamayı kurup açar.
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-TARGET_APP="/Applications/SaltCeviri.app"
-
-if [ ! -d "$TARGET_APP" ] && [ -d "$SCRIPT_DIR/SaltCeviri.app" ]; then
-    echo "SaltÇeviri /Applications klasörüne kopyalanıyor..."
-    cp -R "$SCRIPT_DIR/SaltCeviri.app" "/Applications/"
-fi
-
-if [ -d "$TARGET_APP" ]; then
-    echo "macOS Gatekeeper karantina izni kaldırılıyor..."
-    xattr -cr "$TARGET_APP"
-    echo "SaltÇeviri başlatılıyor..."
-    open "$TARGET_APP"
-else
-    echo "HATA: SaltCeviri.app bulunamadı. Lütfen önce uygulamayı Applications klasörüne sürükleyin."
-fi
-EOF
-chmod +x "$DMG_STAGE/Acilmiyorsa_Buna_Tikla.command"
 
 if [ "$1" = "--stage-only" ]; then
     echo "[Bilgi] .app paketi ve DMG sahnesi hazırlandı: $APP_BUNDLE"

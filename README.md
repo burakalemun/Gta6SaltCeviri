@@ -4,10 +4,10 @@
 > **[SaltCeviri-macOS-M2.dmg İndir (Doğrudan Kurulum Paketi)](https://github.com/burakalemun/Gta6SaltCeviri/raw/main/dist/SaltCeviri-macOS-M2.dmg)** · [Tüm Sürümler (Releases)](https://github.com/burakalemun/Gta6SaltCeviri/releases) · [Kurulum & API Rehberi (NOTLAR.md)](NOTLAR.md)
 
 **Kurulum:** Yukarıdaki `.dmg` dosyasını indirip açın, **`SaltCeviri.app`** ikonunu **`Applications`** klasörüne sürükleyin ve açın.
-> **⚠️ "SaltÇeviri uygulaması açılamıyor / doğrulanamıyor" hatası alırsanız:**
-> Açık kaynaklı uygulamamız henüz ücretli Apple Developer Notarization imzasına sahip olmadığı için macOS ilk açılışta engelleyebilir. Çözüm için ikisinden birini yapın:
-> 1. DMG içindeki **`Acilmiyorsa_Buna_Tikla.command`** dosyasına çift tıklayın (otomatik kurup açar), **VEYA**
-> 2. **Sistem Ayarları → Gizlilik ve Güvenlik** sayfasının en altına inip **"Yine de Aç (Open Anyway)"** butonuna basın.
+> **⚠️ İlk Açılışta `"SaltCeviri" Açılmadı` (Apple doğrulayamadı) Uyarısı Çıkarsa:**
+> Açık kaynaklı uygulamamız henüz ücretli Apple Developer Notarization imzasına sahip olmadığı için tarayıcıdan indirilen `.dmg` dosyalarında macOS ilk açılışta bu uyarıyı gösterir. Açmak için şu 2 yoldan birini yapın (sadece ilk seferde gerekir):
+> 1. **Ayarlar'dan (Önerilen):** Uyarıda **"Bitti"**ye basın → **Sistem Ayarları → Gizlilik ve Güvenlik** sayfasında en aşağı inip **"Yine de Aç (Open Anyway)"** butonuna tıklayın.
+> 2. **Terminal'den Tek Satır:** `xattr -cr /Applications/SaltCeviri.app && open /Applications/SaltCeviri.app`
 
 **Lisans:** MIT License ([LICENSE](LICENSE)) · **Yöntem:** PS Remote Play (Ev Ağı) + Apple Vision OCR + Yerel Ollama / DeepL / Gemini + Tıklama Geçirgen Katman
 **Temel Kısıtlar:**
