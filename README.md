@@ -1,13 +1,15 @@
-# GTA 6 (PS5) Canlı Türkçe Altyazı Sistemi — Proje Dokümanı
+# SaltÇeviri — GTA 6 (PS5) Canlı Türkçe Altyazı Sistemi (macOS Apple Silicon)
 
-**Tarih:** 16 Kasım 2026
-**Proje Klasörü:** `/Users/burakkaya/Desktop/gta6-ps5-altyazi`
-**Hedef Cihaz:** MacBook Pro (Apple Silicon — M2 Çip, macOS)
-**Yöntem:** PS Remote Play + Ekran Okuma (Apple Vision OCR) + Yapay Zeka Çeviri + Ekran Üstü Altyazı Katmanı (Overlay)
+> **⬇️ TEK TIKLA İNDİR (macOS M1/M2/M3/M4):**
+> **[SaltCeviri-macOS-M2.dmg İndir (Doğrudan Kurulum Paketi)](https://github.com/burakalemun/Gta6SaltCeviri/raw/main/dist/SaltCeviri-macOS-M2.dmg)** · [Tüm Sürümler (Releases)](https://github.com/burakalemun/Gta6SaltCeviri/releases) · [Kurulum & API Rehberi (NOTLAR.md)](NOTLAR.md)
+
+**Kurulum:** Yukarıdaki `.dmg` dosyasını indirip açın, **`SaltÇeviri.app`** ikonunu **`Applications`** klasörüne sürükleyin ve açın. İlk açılışta **Kurulum Rehberi (Onboarding)** sizi 4 adımda yönlendirecektir.
+
+**Lisans:** MIT License ([LICENSE](LICENSE)) · **Yöntem:** PS Remote Play (Ev Ağı) + Apple Vision OCR + Yerel Ollama / DeepL / Gemini + Tıklama Geçirgen Katman
 **Temel Kısıtlar:**
 - Harici capture card veya ek fiziksel donanım kullanılmayacak
 - Konsol modlanmayacak (jailbreak yok, PSN ban riski sıfır)
-- Altyazı doğrudan TV ekranında görünecek
+- Altyazı doğrudan TV / Mac ekranında görünecek
 
 ---
 
