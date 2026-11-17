@@ -11,8 +11,8 @@ data/cache.db
 __pycache__/
 *.pyc
 
-# Geçici derleme klasörleri ve tekil ikili dosyalar
+# Geçici derleme klasörleri ve ikili dosyalar
 build/
 macos-swift/GTA6Altyazi
 macos-swift/.build/
-dist/GTA6 Türkçe Altyazı.app/
+dist/*.app/

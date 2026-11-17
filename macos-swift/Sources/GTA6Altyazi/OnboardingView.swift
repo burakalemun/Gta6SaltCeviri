@@ -28,10 +28,10 @@ struct OnboardingView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Hoş Geldiniz — Hızlı Kurulum Rehberi")
+                    Text("SaltÇeviri — Hızlı Kurulum Rehberi")
                         .font(.system(size: 18, weight: .heavy, design: .rounded))
                         .foregroundColor(.white)
-                    Text("GTA 6 (PS5) Canlı Türkçe Altyazı Sistemini 4 adımda kullanıma hazırlayın")
+                    Text("Canlı Ekran & PS5 Türkçe Altyazı Sistemini 4 adımda kullanıma hazırlayın")
                         .font(.system(size: 12))
                         .foregroundColor(Color(white: 0.68))
                 }
@@ -136,7 +136,7 @@ struct OnboardingView: View {
 
             noteBox(items: [
                 "Aşağıdaki butona tıklayarak Sistem Ayarları → Gizlilik ve Güvenlik → Ekran ve Sistem Ses Kaydı ekranını açın.",
-                "Listede 'GTA6 Türkçe Altyazı' anahtarını açık konuma getirin.",
+                "Listede 'SaltÇeviri' anahtarını açık konuma getirin.",
                 "macOS 'Çık ve Yeniden Aç' uyarısı gösterirse onaylayın."
             ])
 
@@ -181,11 +181,25 @@ struct OnboardingView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(.neonEmerald)
 
-                Text(state.ollamaOnline ? "✅ Ollama Aktif" : (!state.deeplApiKey.isEmpty ? "✅ DeepL Aktif" : state.ollamaStatusText))
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundColor(.viceGold)
-                    .lineLimit(2)
+                Button("🔑 DeepL Free Anahtarı Al") {
+                    if let url = URL(string: "https://www.deepl.com/en/pro-api") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .buttonStyle(.bordered)
+
+                Button("✨ Gemini API Al") {
+                    if let url = URL(string: "https://aistudio.google.com/apikey") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
+                .buttonStyle(.bordered)
             }
+
+            Text(state.ollamaOnline ? "✅ Ollama Aktif" : (!state.deeplApiKey.isEmpty ? "✅ DeepL Aktif" : state.ollamaStatusText))
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundColor(.viceGold)
+                .lineLimit(2)
         }
     }
 

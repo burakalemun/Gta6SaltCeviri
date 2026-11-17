@@ -95,14 +95,14 @@ struct DashboardView: View {
                         .foregroundColor(.black)
                 }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("GTA 6 ALTYAZI")
-                        .font(.system(size: 14, weight: .heavy, design: .rounded))
-                        .foregroundColor(.white)
-                    Text("M2 OLLAMA + VISION")
-                        .font(.system(size: 9, weight: .bold, design: .monospaced))
-                        .foregroundColor(.jasonCyan)
-                }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("SALTÇEVİRİ")
+                            .font(.system(size: 15, weight: .heavy, design: .rounded))
+                            .foregroundColor(.white)
+                        Text("M2 VISION • CANLI ALTYAZI")
+                            .font(.system(size: 9, weight: .bold, design: .monospaced))
+                            .foregroundColor(.jasonCyan)
+                    }
             }
             .padding(.horizontal, 16)
             .padding(.top, 20)
@@ -999,6 +999,29 @@ struct DashboardView: View {
                         SecureField("Opsiyonel DeepL API Anahtarı:", text: $state.deeplApiKey)
                     }
                     .textFieldStyle(.roundedBorder)
+
+                    // Tek Tıkla API Anahtarı Alma Bağlantıları
+                    HStack(spacing: 10) {
+                        Text("Ücretsiz API Anahtarı Al:")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(Color(white: 0.65))
+
+                        Button("🔑 DeepL API Free (500K/ay)") {
+                            if let url = URL(string: "https://www.deepl.com/en/pro-api") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+
+                        Button("✨ Google Gemini Flash (AI Studio)") {
+                            if let url = URL(string: "https://aistudio.google.com/apikey") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
 
                     HStack(spacing: 12) {
                         Button(action: {

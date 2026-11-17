@@ -11,18 +11,18 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
-APP_NAME="GTA6 Türkçe Altyazı"
-DMG_NAME="GTA6-PS5-Altyazi-macOS-M2.dmg"
+APP_NAME="SaltÇeviri"
+DMG_NAME="SaltCeviri-macOS-M2.dmg"
 BUILD_DIR="$PROJECT_DIR/build"
 DIST_DIR="$PROJECT_DIR/dist"
 DMG_STAGE="$BUILD_DIR/dmg_stage"
 APP_BUNDLE="$DIST_DIR/${APP_NAME}.app"
 
 echo "============================================================"
-echo " GTA 6 (PS5) Türkçe Altyazı — macOS .app ve .dmg Üretici"
+echo " SaltÇeviri — macOS .app ve .dmg Üretici (M2 ARM64)"
 echo "============================================================"
 
-rm -rf "$BUILD_DIR" "$APP_BUNDLE" "$DIST_DIR/$DMG_NAME"
+rm -rf "$BUILD_DIR" "$DIST_DIR"/*.app "$DIST_DIR"/*.dmg "$DMG_STAGE"
 mkdir -p "$BUILD_DIR" "$DIST_DIR" "$DMG_STAGE"
 
 # 1) macOS Uygulama İkonu (.icns) Oluştur (Apple Quartz / sips + iconutil)
@@ -142,11 +142,11 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>GTA6 Türkçe Altyazı</string>
+    <string>SaltÇeviri</string>
     <key>CFBundleDisplayName</key>
-    <string>GTA6 Türkçe Altyazı</string>
+    <string>SaltÇeviri</string>
     <key>CFBundleIdentifier</key>
-    <string>com.gta6ps5.turkcealtyazi</string>
+    <string>com.saltceviri.app</string>
     <key>CFBundleVersion</key>
     <string>2.0.0</string>
     <key>CFBundleShortVersionString</key>
@@ -162,14 +162,14 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSScreenCaptureUsageDescription</key>
-    <string>PS Remote Play penceresindeki İngilizce altyazıları okuyup canlı olarak Türkçeye çevirmek için ekran kaydı izni gereklidir.</string>
+    <string>SaltÇeviri'nin PS Remote Play veya seçilen ekran bölgesindeki İngilizce altyazıları okuyup Türkçeye çevirmesi için ekran kaydı izni gereklidir.</string>
 </dict>
 </plist>
 EOF
 
 # 2.5) macOS İmzalama (Ekran Kaydı izni kimliği sabit kalsın diye)
 xattr -cr "$APP_BUNDLE"
-codesign --force --deep --sign - --identifier com.gta6ps5.turkcealtyazi "$APP_BUNDLE"
+codesign --force --deep --sign - --identifier com.saltceviri.app "$APP_BUNDLE"
 
 # 3) DMG Sahnesini Hazırla (.app + Applications Kısayolu + Kurulum Notları)
 cp -R "$APP_BUNDLE" "$DMG_STAGE/"
@@ -185,7 +185,7 @@ fi
 
 echo "[Bilgi] .dmg kurulum imajı oluşturuluyor..."
 hdiutil create \
-    -volname "GTA 6 PS5 Turkce Altyazi" \
+    -volname "SaltCeviri macOS M2" \
     -srcfolder "$DMG_STAGE" \
     -ov \
     -format UDZO \

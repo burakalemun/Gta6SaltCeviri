@@ -13,7 +13,7 @@ struct GTA6AltyaziApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("GTA 6 (PS5) Canlı Türkçe Altyazı — M2 Ev Ağı Stüdyosu") {
+        WindowGroup("SaltÇeviri — Canlı Ekran & PS5 Türkçe Altyazı") {
             DashboardView(state: appState)
                 .onAppear {
                     NSApplication.shared.activate(ignoringOtherApps: true)
@@ -23,7 +23,7 @@ struct GTA6AltyaziApp: App {
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1060, height: 700)
 
-        MenuBarExtra("GTA6 Altyazı", systemImage: "captions.bubble.fill") {
+        MenuBarExtra("SaltÇeviri", systemImage: "captions.bubble.fill") {
             Button(appState.isPaused ? "▶ Canlı Çeviriyi Başlat" : "⏸ Yakalamayı Duraklat") {
                 appState.togglePause()
             }
