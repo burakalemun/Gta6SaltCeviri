@@ -2,7 +2,10 @@
 
 **SaltÇeviri**, Apple Silicon (**M1/M2/M3/M4**) MacBook'lar için geliştirilmiş, **PS5 (GTA 6)** ve ekrandaki herhangi bir İngilizce içeriği **Apple Vision (Neural Engine)** ile okuyup anlık Türkçeye çeviren yerel macOS uygulamasıdır.
 
-`SaltCeviri-macOS-M2.dmg` dosyasını açıp **`SaltÇeviri.app`** ikonunu **`Applications`** klasörüne sürükledikten sonra aşağıdaki adımları sırayla uygulayın:
+`SaltCeviri-macOS-M2.dmg` dosyasını açıp **`SaltCeviri.app`** ikonunu **`Applications`** klasörüne sürükledikten sonra aşağıdaki adımları sırayla uygulayın:
+
+> **⚠️ "SaltÇeviri uygulaması açılamıyor" uyarısı çıkarsa:**
+> DMG içindeki **`Acilmiyorsa_Buna_Tikla.command`** dosyasına çift tıklayın (veya **Sistem Ayarları → Gizlilik ve Güvenlik → Yine de Aç** deyin). Bu işlem sadece ilk açılışta gerekir.
 
 ---
 

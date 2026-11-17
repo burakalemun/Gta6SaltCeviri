@@ -3,7 +3,11 @@
 > **⬇️ TEK TIKLA İNDİR (macOS M1/M2/M3/M4):**
 > **[SaltCeviri-macOS-M2.dmg İndir (Doğrudan Kurulum Paketi)](https://github.com/burakalemun/Gta6SaltCeviri/raw/main/dist/SaltCeviri-macOS-M2.dmg)** · [Tüm Sürümler (Releases)](https://github.com/burakalemun/Gta6SaltCeviri/releases) · [Kurulum & API Rehberi (NOTLAR.md)](NOTLAR.md)
 
-**Kurulum:** Yukarıdaki `.dmg` dosyasını indirip açın, **`SaltÇeviri.app`** ikonunu **`Applications`** klasörüne sürükleyin ve açın. İlk açılışta **Kurulum Rehberi (Onboarding)** sizi 4 adımda yönlendirecektir.
+**Kurulum:** Yukarıdaki `.dmg` dosyasını indirip açın, **`SaltCeviri.app`** ikonunu **`Applications`** klasörüne sürükleyin ve açın.
+> **⚠️ "SaltÇeviri uygulaması açılamıyor / doğrulanamıyor" hatası alırsanız:**
+> Açık kaynaklı uygulamamız henüz ücretli Apple Developer Notarization imzasına sahip olmadığı için macOS ilk açılışta engelleyebilir. Çözüm için ikisinden birini yapın:
+> 1. DMG içindeki **`Acilmiyorsa_Buna_Tikla.command`** dosyasına çift tıklayın (otomatik kurup açar), **VEYA**
+> 2. **Sistem Ayarları → Gizlilik ve Güvenlik** sayfasının en altına inip **"Yine de Aç (Open Anyway)"** butonuna basın.
 
 **Lisans:** MIT License ([LICENSE](LICENSE)) · **Yöntem:** PS Remote Play (Ev Ağı) + Apple Vision OCR + Yerel Ollama / DeepL / Gemini + Tıklama Geçirgen Katman
 **Temel Kısıtlar:**
