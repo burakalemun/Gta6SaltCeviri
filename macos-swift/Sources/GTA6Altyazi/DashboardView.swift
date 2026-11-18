@@ -877,14 +877,21 @@ struct DashboardView: View {
                         .foregroundColor(.luciaPink)
 
                     HStack(spacing: 12) {
-                        Button("🔗 Android TV'ye Kablosuz Bağlan (ADB)") {
+                        Button(state.isConnectingADB ? "⏳ Bağlanılıyor..." : "🔗 Android TV'ye Kablosuz Bağlan (ADB)") {
                             state.connectAndroidTV()
                         }
                         .buttonStyle(.borderedProminent)
+                        .disabled(state.isConnectingADB)
+
+                        if state.isConnectingADB {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
 
                         Text(state.adbStatusMessage)
-                            .font(.system(size: 11))
-                            .foregroundColor(state.adbConnected ? .neonEmerald : Color(white: 0.68))
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(state.adbConnected ? .neonEmerald : .viceGold)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .padding(16)

@@ -75,6 +75,7 @@ final class AppState: ObservableObject {
     @Published var remotePlayInstallStatus: String = ""
     @Published var adbStatusMessage: String = "TV'de Ayarlar -> Cihaz Tercihleri -> Hakkında -> Derleme Numarası'na 7 kez basıp Ağ Hata Ayıklama'yı açın."
     @Published var adbConnected: Bool = false
+    @Published var isConnectingADB: Bool = false
 
     // Canlı Diyalog Geçmişi & İlk Kurulum (Onboarding)
     @Published var dialogueHistory: [DialogueLogItem] = []
@@ -1535,19 +1536,38 @@ final class AppState: ObservableObject {
         let ip = androidTVIP.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !ip.isEmpty else {
             adbConnected = false
-            adbStatusMessage = "Lütfen TV'nin yerel IP adresini girin (örn. 192.168.1.55)."
+            adbStatusMessage = "⚠️ Lütfen TV'nin yerel IP adresini girin (örn. 192.168.1.55)."
             return
         }
-        let target = ip.contains(":") ? ip : "\(ip):5555"
-        adbStatusMessage = "ADB kontrol ediliyor ve \(target) adresine bağlanılıyor..."
+        guard !isConnectingADB else { return }
+
+        let hostOnly = ip.components(separatedBy: ":").first ?? ip
+        let portNum: UInt16 = UInt16(ip.components(separatedBy: ":").dropFirst().first ?? "") ?? 5555
+        let target = "\(hostOnly):\(portNum)"
+        let currentTVURL = tvServerURL
+
+        isConnectingADB = true
+        adbConnected = false
+        adbStatusMessage = "⏳ \(target) portuna bağlanılıyor..."
 
         Task.detached {
+            // 1) Hızlı 3 saniyelik TCP port kontrolü (adb connect'in 60 sn donmasını önler)
+            let portReachable = Self.isTCPPortOpen(host: hostOnly, port: portNum, timeoutSec: 3.0)
+            if !portReachable {
+                await MainActor.run {
+                    self.isConnectingADB = false
+                    self.adbConnected = false
+                    self.adbStatusMessage = "❌ \(target) yanıt vermiyor. TV'de 'Geliştirici Seçenekleri -> Ağ/USB Hata Ayıklama' açık mı ve IP doğru mu?"
+                }
+                return
+            }
+
             var adbPath = Self.resolveADBBinaryPath()
 
-            // Mac'te adb yoksa Google'ın resmi macOS platform-tools paketini otomatik indir
+            // 2) Mac'te adb yoksa Google'ın resmi macOS platform-tools paketini otomatik indir
             if adbPath == nil {
                 await MainActor.run {
-                    self.adbStatusMessage = "Google Android ADB aracı otomatik indiriliyor (~7 MB)..."
+                    self.adbStatusMessage = "⬇ Google Android ADB aracı otomatik indiriliyor (~15 MB)..."
                 }
                 let installBase = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
                     .appendingPathComponent("GTA6PS5Altyazi", isDirectory: true)
@@ -1578,37 +1598,101 @@ final class AppState: ObservableObject {
 
             guard let validADB = adbPath else {
                 await MainActor.run {
+                    self.isConnectingADB = false
                     self.adbConnected = false
-                    self.adbStatusMessage = "ADB indirilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."
+                    self.adbStatusMessage = "❌ ADB aracı bulunamadı veya indirilemedi."
                 }
                 return
             }
 
-            let proc = Process()
-            let pipe = Pipe()
-            proc.executableURL = URL(fileURLWithPath: validADB)
-            proc.arguments = ["connect", target]
-            proc.standardOutput = pipe
-            proc.standardError = pipe
-            do {
-                try proc.run()
-                proc.waitUntilExit()
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                let out = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-                let ok = out.lowercased().contains("connected to")
-                await MainActor.run {
-                    self.adbConnected = ok
-                    self.adbStatusMessage = ok
-                        ? "✅ Android TV bağlantısı başarılı! (\(out)) TV ekranında 'USB/Ağ Hata Ayıklamaya İzin Ver' uyarısını onaylayın."
-                        : "ADB yanıtı: \(out)"
-                }
-            } catch {
-                await MainActor.run {
-                    self.adbConnected = false
-                    self.adbStatusMessage = "ADB çalıştırılamadı: \(error.localizedDescription)"
+            // 3) adb connect çalıştır
+            let (status, out) = Self.runProcessWithTimeout(
+                executable: validADB,
+                arguments: ["connect", target],
+                timeoutSec: 6.0
+            )
+            let ok = (status == 0) && out.lowercased().contains("connected to")
+
+            if ok {
+                // Bağlantı kurulduğunda TV ekranında canlı Türkçe altyazı sayfasını otomatik açmayı dene
+                _ = Self.runProcessWithTimeout(
+                    executable: validADB,
+                    arguments: ["-s", target, "shell", "am", "start", "-a", "android.intent.action.VIEW", "-d", currentTVURL],
+                    timeoutSec: 4.0
+                )
+            }
+
+            await MainActor.run {
+                self.isConnectingADB = false
+                self.adbConnected = ok
+                if ok {
+                    self.adbStatusMessage = "✅ Bağlandı (\(target))! TV ekranında izin uyarısı çıkarsa onaylayın; altyazı ekranı TV'ye gönderildi."
+                } else {
+                    self.adbStatusMessage = "⚠️ ADB yanıtı: \(out.isEmpty ? "Zaman aşımı (TV'de izin penceresini onaylayın)" : out)"
                 }
             }
         }
+    }
+
+    nonisolated private static func isTCPPortOpen(host: String, port: UInt16, timeoutSec: Double) -> Bool {
+        let sock = socket(AF_INET, SOCK_STREAM, 0)
+        guard sock >= 0 else { return false }
+        defer { close(sock) }
+
+        let flags = fcntl(sock, F_GETFL, 0)
+        _ = fcntl(sock, F_SETFL, flags | O_NONBLOCK)
+
+        var addr = sockaddr_in()
+        addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_port = port.bigEndian
+        guard inet_pton(AF_INET, host, &addr.sin_addr) == 1 else { return false }
+
+        let res = withUnsafePointer(to: &addr) { ptr in
+            ptr.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                connect(sock, $0, socklen_t(MemoryLayout<sockaddr_in>.size))
+            }
+        }
+        if res == 0 { return true }
+        guard errno == EINPROGRESS else { return false }
+
+        var pfd = pollfd(fd: sock, events: Int16(POLLOUT), revents: 0)
+        let pollRes = poll(&pfd, 1, Int32(timeoutSec * 1000))
+        if pollRes <= 0 { return false }
+
+        var soError: Int32 = 0
+        var len = socklen_t(MemoryLayout<Int32>.size)
+        getsockopt(sock, SOL_SOCKET, SO_ERROR, &soError, &len)
+        return soError == 0
+    }
+
+    nonisolated private static func runProcessWithTimeout(
+        executable: String,
+        arguments: [String],
+        timeoutSec: Double
+    ) -> (Int32, String) {
+        let proc = Process()
+        let pipe = Pipe()
+        proc.executableURL = URL(fileURLWithPath: executable)
+        proc.arguments = arguments
+        proc.standardOutput = pipe
+        proc.standardError = pipe
+        do {
+            try proc.run()
+        } catch {
+            return (-1, error.localizedDescription)
+        }
+        let deadline = Date().addingTimeInterval(timeoutSec)
+        while proc.isRunning && Date() < deadline {
+            Thread.sleep(forTimeInterval: 0.05)
+        }
+        if proc.isRunning {
+            proc.terminate()
+            return (-2, "Zaman aşımı")
+        }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let out = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return (proc.terminationStatus, out)
     }
 
     static func getLocalIPAddress() -> String {
