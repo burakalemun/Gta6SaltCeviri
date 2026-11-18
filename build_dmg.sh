@@ -134,6 +134,9 @@ cp "$PROJECT_DIR/.env.example" "$APP_BUNDLE/Contents/Resources/app/.env.example"
 if [ -f "$PROJECT_DIR/NOTLAR.md" ]; then
     cp "$PROJECT_DIR/NOTLAR.md" "$APP_BUNDLE/Contents/Resources/app/NOTLAR.md"
 fi
+if [ -f "$PROJECT_DIR/android-tv-overlay/SaltCeviriTV.apk" ]; then
+    cp "$PROJECT_DIR/android-tv-overlay/SaltCeviriTV.apk" "$APP_BUNDLE/Contents/Resources/app/SaltCeviriTV.apk"
+fi
 
 # Info.plist oluştur (Ekran Kaydı izni açıklaması ve Retina desteği dahil)
 cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF

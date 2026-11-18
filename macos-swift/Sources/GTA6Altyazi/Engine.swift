@@ -1614,22 +1614,67 @@ final class AppState: ObservableObject {
             let ok = (status == 0) && out.lowercased().contains("connected to")
 
             if ok {
-                // Bağlantı kurulduğunda TV ekranında canlı Türkçe altyazı sayfasını otomatik açmayı dene
-                _ = Self.runProcessWithTimeout(
-                    executable: validADB,
-                    arguments: ["-s", target, "shell", "am", "start", "-a", "android.intent.action.VIEW", "-d", currentTVURL],
-                    timeoutSec: 4.0
-                )
+                let apiSubtitleURL = "\(currentTVURL)/api/subtitle"
+                let bundleAPK = Bundle.main.resourceURL?.appendingPathComponent("app/SaltCeviriTV.apk").path
+                let devAPK = "/Users/burakkaya/Desktop/gta6-ps5-altyazi/android-tv-overlay/SaltCeviriTV.apk"
+                let apkPath = (bundleAPK != nil && FileManager.default.fileExists(atPath: bundleAPK!))
+                    ? bundleAPK!
+                    : (FileManager.default.fileExists(atPath: devAPK) ? devAPK : nil)
+
+                var overlayInstalled = false
+                if let validAPK = apkPath {
+                    await MainActor.run {
+                        self.adbStatusMessage = "📦 Bağlandı! TV'ye şeffaf altyazı katmanı (SaltCeviriTV.apk) kuruluyor..."
+                    }
+                    let (instCode, _) = Self.runProcessWithTimeout(
+                        executable: validADB,
+                        arguments: ["-s", target, "install", "-r", validAPK],
+                        timeoutSec: 15.0
+                    )
+                    if instCode == 0 {
+                        overlayInstalled = true
+                        // HDMI 1 (PS5) dahil tüm ekranların üstünde gösterme iznini otomatik ver
+                        _ = Self.runProcessWithTimeout(
+                            executable: validADB,
+                            arguments: ["-s", target, "shell", "appops", "set", "com.saltceviri.tv", "SYSTEM_ALERT_WINDOW", "allow"],
+                            timeoutSec: 4.0
+                        )
+                        // Arka plan altyazı katmanı servisini başlat
+                        _ = Self.runProcessWithTimeout(
+                            executable: validADB,
+                            arguments: ["-s", target, "shell", "am", "startservice", "-n", "com.saltceviri.tv/.SubtitleOverlayService", "--es", "server_url", apiSubtitleURL],
+                            timeoutSec: 4.0
+                        )
+                        _ = Self.runProcessWithTimeout(
+                            executable: validADB,
+                            arguments: ["-s", target, "shell", "am", "start", "-n", "com.saltceviri.tv/.MainActivity", "--es", "server_url", apiSubtitleURL],
+                            timeoutSec: 4.0
+                        )
+                    }
+                }
+
+                if !overlayInstalled {
+                    _ = Self.runProcessWithTimeout(
+                        executable: validADB,
+                        arguments: ["-s", target, "shell", "am", "start", "-a", "android.intent.action.VIEW", "-d", currentTVURL],
+                        timeoutSec: 4.0
+                    )
+                }
+
+                await MainActor.run {
+                    self.isConnectingADB = false
+                    self.adbConnected = true
+                    self.adbStatusMessage = overlayInstalled
+                        ? "✅ TV'ye SaltCeviri Overlay kuruldu ve başlatıldı! Şimdi TV'yi PS5 (HDMI 1) girişine alıp oynayabilirsiniz."
+                        : "✅ Bağlandı (\(target))! TV'de canlı altyazı ekranı açıldı."
+                }
+                return
             }
 
             await MainActor.run {
                 self.isConnectingADB = false
-                self.adbConnected = ok
-                if ok {
-                    self.adbStatusMessage = "✅ Bağlandı (\(target))! TV ekranında izin uyarısı çıkarsa onaylayın; altyazı ekranı TV'ye gönderildi."
-                } else {
-                    self.adbStatusMessage = "⚠️ ADB yanıtı: \(out.isEmpty ? "Zaman aşımı (TV'de izin penceresini onaylayın)" : out)"
-                }
+                self.adbConnected = false
+                self.adbStatusMessage = "⚠️ ADB yanıtı: \(out.isEmpty ? "Zaman aşımı (TV'de izin penceresini onaylayın)" : out)"
             }
         }
     }
