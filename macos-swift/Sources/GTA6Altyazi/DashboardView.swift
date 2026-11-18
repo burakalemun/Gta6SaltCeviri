@@ -465,7 +465,7 @@ struct DashboardView: View {
                 Text("macOS Ekran Kaydı İzni Gerekli (Diğer Pencereleri Okuyabilmek İçin)")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.white)
-                Text("İzin kapalıysa macOS sadece boş masaüstü duvar kağıdını verir ve 'Metin Bulunamadı' yazar. Ayarlar'dan 'GTA6 Türkçe Altyazı' iznini açın (açıksa kapatıp tekrar açın).")
+                Text("İzin kapalıysa macOS sadece boş masaüstü duvar kağıdını verir ve 'Metin Bulunamadı' yazar. Ayarlar'dan 'SaltÇeviri' iznini açın (açıksa kapatıp tekrar açın).")
                     .font(.system(size: 11))
                     .foregroundColor(Color(white: 0.78))
             }

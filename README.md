@@ -52,8 +52,8 @@ gta6-ps5-altyazi/
 ├── run.sh                    # Tek komutla kurulum ve başlatma betiği
 ├── build_dmg.sh              # macOS .app ve .dmg kurulum imajı üretici betik
 ├── dist/
-│   ├── GTA6 Türkçe Altyazı.app          # Çift tıklanabilir macOS uygulaması
-│   └── GTA6-PS5-Altyazi-macOS-M2.dmg    # Sürükle-bırak macOS kurulum imajı
+│   ├── SaltCeviri.app                   # Çift tıklanabilir macOS uygulaması
+│   └── SaltCeviri-macOS-M2.dmg          # Sürükle-bırak macOS kurulum imajı
 ├── data/
 │   ├── glossary.json         # GTA 6 özel isimler ve argo sözlüğü
 │   └── cache.db              # SQLite çeviri önbelleği (çalışırken oluşur)
@@ -79,7 +79,7 @@ MacBook Pro ile TV arasına HDMI kablosu çekmeye gerek kalmadan her şey **Ev A
      │                                                                                  ▲
      │ 1. Ev Ağı (Remote Play Akışı)                                                    │ 8. Ev Ağı Wi-Fi (:8765)
      ▼                                                                                  │    Türkçe Altyazı Katmanı
-[M2 MacBook Pro — Native Swift Stüdyosu (GTA6 Türkçe Altyazı.app)] ─────────────────────┘
+[M2 MacBook Pro — Native Swift Stüdyosu (SaltCeviri.app)] ──────────────────────────────┘
      ├──► 2. Pencere Yakalama (CoreGraphics / Quartz — Alt %20 ROI)
      ├──► 3. Değişiklik Algılama (64-bit dHash fark kontrolü)
      ├──► 4. OCR ile Metin Okuma (Apple Vision — M2 16 Çekirdekli Neural Engine)
