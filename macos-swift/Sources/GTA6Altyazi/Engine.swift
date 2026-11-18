@@ -1513,7 +1513,24 @@ final class AppState: ObservableObject {
         }
     }
 
-    // MARK: - Android TV (ADB) Bağlantısı ve Yerel IP
+    // MARK: - Android TV (ADB) Bağlantısı (Eksikse Google Platform-Tools Otomatik Kurar)
+    nonisolated static func resolveADBBinaryPath() -> String? {
+        let appSupportADB = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            .appendingPathComponent("GTA6PS5Altyazi/platform-tools/adb").path
+        let homeSDK = NSHomeDirectory() + "/Library/Android/sdk/platform-tools/adb"
+        let candidates = [
+            appSupportADB,
+            "/opt/homebrew/bin/adb",
+            "/usr/local/bin/adb",
+            homeSDK,
+            "/usr/bin/adb"
+        ]
+        for path in candidates where FileManager.default.isExecutableFile(atPath: path) {
+            return path
+        }
+        return nil
+    }
+
     func connectAndroidTV() {
         let ip = androidTVIP.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !ip.isEmpty else {
@@ -1522,27 +1539,73 @@ final class AppState: ObservableObject {
             return
         }
         let target = ip.contains(":") ? ip : "\(ip):5555"
+        adbStatusMessage = "ADB kontrol ediliyor ve \(target) adresine bağlanılıyor..."
+
         Task.detached {
+            var adbPath = Self.resolveADBBinaryPath()
+
+            // Mac'te adb yoksa Google'ın resmi macOS platform-tools paketini otomatik indir
+            if adbPath == nil {
+                await MainActor.run {
+                    self.adbStatusMessage = "Google Android ADB aracı otomatik indiriliyor (~7 MB)..."
+                }
+                let installBase = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+                    .appendingPathComponent("GTA6PS5Altyazi", isDirectory: true)
+                try? FileManager.default.createDirectory(at: installBase, withIntermediateDirectories: true)
+                let zipPath = installBase.appendingPathComponent("platform-tools.zip").path
+
+                let dl = Process()
+                dl.executableURL = URL(fileURLWithPath: "/usr/bin/curl")
+                dl.arguments = [
+                    "-fL",
+                    "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip",
+                    "-o", zipPath
+                ]
+                if (try? dl.run()) != nil {
+                    dl.waitUntilExit()
+                    if dl.terminationStatus == 0 {
+                        let unzip = Process()
+                        unzip.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+                        unzip.arguments = ["-x", "-k", zipPath, installBase.path]
+                        if (try? unzip.run()) != nil {
+                            unzip.waitUntilExit()
+                        }
+                        try? FileManager.default.removeItem(atPath: zipPath)
+                    }
+                }
+                adbPath = Self.resolveADBBinaryPath()
+            }
+
+            guard let validADB = adbPath else {
+                await MainActor.run {
+                    self.adbConnected = false
+                    self.adbStatusMessage = "ADB indirilemedi. İnternet bağlantınızı kontrol edip tekrar deneyin."
+                }
+                return
+            }
+
             let proc = Process()
             let pipe = Pipe()
-            proc.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-            proc.arguments = ["adb", "connect", target]
+            proc.executableURL = URL(fileURLWithPath: validADB)
+            proc.arguments = ["connect", target]
             proc.standardOutput = pipe
             proc.standardError = pipe
             do {
                 try proc.run()
                 proc.waitUntilExit()
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                let out = String(data: data, encoding: .utf8) ?? ""
+                let out = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
                 let ok = out.lowercased().contains("connected to")
                 await MainActor.run {
                     self.adbConnected = ok
-                    self.adbStatusMessage = ok ? "Android TV bağlantısı başarılı: \(out.trimmingCharacters(in: .whitespacesAndNewlines))" : "ADB yanıtı: \(out.trimmingCharacters(in: .whitespacesAndNewlines))"
+                    self.adbStatusMessage = ok
+                        ? "✅ Android TV bağlantısı başarılı! (\(out)) TV ekranında 'USB/Ağ Hata Ayıklamaya İzin Ver' uyarısını onaylayın."
+                        : "ADB yanıtı: \(out)"
                 }
             } catch {
                 await MainActor.run {
                     self.adbConnected = false
-                    self.adbStatusMessage = "macOS üzerinde 'adb' bulunamadı. Kurmak için: brew install android-platform-tools"
+                    self.adbStatusMessage = "ADB çalıştırılamadı: \(error.localizedDescription)"
                 }
             }
         }
