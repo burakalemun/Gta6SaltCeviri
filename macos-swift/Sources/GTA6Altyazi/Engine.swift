@@ -1639,15 +1639,20 @@ final class AppState: ObservableObject {
                             arguments: ["-s", target, "shell", "appops", "set", "com.saltceviri.tv", "SYSTEM_ALERT_WINDOW", "allow"],
                             timeoutSec: 4.0
                         )
-                        // Arka plan altyazı katmanı servisini başlat
                         _ = Self.runProcessWithTimeout(
                             executable: validADB,
-                            arguments: ["-s", target, "shell", "am", "startservice", "-n", "com.saltceviri.tv/.SubtitleOverlayService", "--es", "server_url", apiSubtitleURL],
+                            arguments: ["-s", target, "shell", "pm", "grant", "com.saltceviri.tv", "android.permission.SYSTEM_ALERT_WINDOW"],
+                            timeoutSec: 4.0
+                        )
+                        // Şeffaf başlatıcı aktivite üzerinden arka plan altyazı katmanı servisini başlat
+                        _ = Self.runProcessWithTimeout(
+                            executable: validADB,
+                            arguments: ["-s", target, "shell", "am", "start", "-n", "com.saltceviri.tv/.MainActivity", "--es", "server_url", apiSubtitleURL],
                             timeoutSec: 4.0
                         )
                         _ = Self.runProcessWithTimeout(
                             executable: validADB,
-                            arguments: ["-s", target, "shell", "am", "start", "-n", "com.saltceviri.tv/.MainActivity", "--es", "server_url", apiSubtitleURL],
+                            arguments: ["-s", target, "shell", "am", "startservice", "-n", "com.saltceviri.tv/.SubtitleOverlayService", "--es", "server_url", apiSubtitleURL],
                             timeoutSec: 4.0
                         )
                     }
@@ -1661,12 +1666,20 @@ final class AppState: ObservableObject {
                     )
                 }
 
+                let didInstallOverlay = overlayInstalled
                 await MainActor.run {
                     self.isConnectingADB = false
                     self.adbConnected = true
-                    self.adbStatusMessage = overlayInstalled
-                        ? "✅ TV'ye SaltCeviri Overlay kuruldu ve başlatıldı! Şimdi TV'yi PS5 (HDMI 1) girişine alıp oynayabilirsiniz."
+                    self.adbStatusMessage = didInstallOverlay
+                        ? "✅ TV'ye SaltÇeviri Overlay kuruldu ve başlatıldı! Şimdi TV'yi PS5 (HDMI 1) girişine alıp oynayabilirsiniz."
                         : "✅ Bağlandı (\(target))! TV'de canlı altyazı ekranı açıldı."
+                    // TV ekranının altında bağlantının çalıştığını kanıtlayan karşılama altyazısını hemen göster
+                    self.applyNewSubtitle(
+                        speaker: "SALTÇEVİRİ",
+                        turkish: "TV Altyazı Katmanı Aktif! Şimdi PS5 (HDMI) girişine geçebilirsiniz.",
+                        english: "TV Overlay Connected (\(target))",
+                        meta: "ADB Overlay Aktif"
+                    )
                 }
                 return
             }
